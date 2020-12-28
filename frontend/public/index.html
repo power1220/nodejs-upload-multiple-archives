@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+</head>
+<body class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <h3>Uploading files using BuBoy</h3>
+      <form method="POST" enctype="multipart/form-data" id="form">
+        <div class="form-group">
+          <label for="field">Files</label>
+          <input
+            type="file"
+            class="form-control"
+            id="file"
+            name="file"
+            onchange="showSize()"
+            multiple
+          />
+
+          <output class="span" id="size">1GB</output>
+          <br>
+          <output class="span" id="msg">File uploaded with Success!</output>
+          
+          <div class="form-group">
+            <input type="submit" class="btn btn-success">
+            <input type="reset" class="btn btn-danger">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const $ = (element) => {
+      return document.querySelector(element);
+    };
+
+    let bytesAmount = 0;
+
+    const formatBytes = (bytes, decimals = 2) => {
+      if (bytes === 0) return '0 Bytes';
+
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+      return (
+        parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
+      );
+    };
+
+    const updateStatus = (size) => {
+      const text = `Pending Bytes to Upload: <strong>${formatBytes(size)}</strong>`;
+
+      $('#size').innerHTML = text;
+    };
+
+    window.showSize = () => {
+      const { files: fileElements } = $('#file');
+      
+      if (!fileElements.length) return;
+      
+      const files = Array.from(fileElements);
+      const { size } = files.reduce((prev, next) => ({
+        size: prev.size + next.size
+      }), { size: 0 });
+
+      bytesAmount = size;
+
+      updateStatus(size);
+
+      const interval = setInterval(() => {
+        console.count();
+        const result = bytesAmount - 5e6;
+
+        bytesAmount = result < 0 ? 0 : result;
+
+        updateStatus(bytesAmount);
+
+        if (bytesAmount === 0) clearInterval(interval);
+      }, 250);
+    };
+
+    window.onload = () => {
+      console.log('loadedddd')
+    };
+  </script>
+</body>
+</html>
